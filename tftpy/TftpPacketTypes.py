@@ -25,8 +25,8 @@ class TftpPacketWithOptions(object):
         log.debug("options: %s", str(options))
         myoptions = {}
         for key in options:
-            newkey = str(key)
-            myoptions[newkey] = str(options[key])
+            newkey = bytes(key, 'utf-8') if not type(key) is bytes else key
+            myoptions[newkey] = bytes(str(options[key]), 'utf-8') if not type(options[key]) is bytes else options[key]
             log.debug("populated myoptions with %s = %s",
                          newkey, myoptions[newkey])
 
@@ -59,7 +59,7 @@ class TftpPacketWithOptions(object):
         log.debug("about to iterate options buffer counting nulls")
         length = 0
         for c in buffer:
-            if ord(c) == 0:
+            if (c if type(c) is int else ord(c)) == 0:
                 log.debug("found a null at length %d", length)
                 if length > 0:
                     format += "%dsx" % length
